@@ -1,85 +1,95 @@
 # Global Health Spending Analysis
 
-## Introduction
+### Introduction
 
-This project aims to analyze global healthcare resource allocation by examining health expenditure data. The analysis provides insights into how countries allocate resources to health, trends over time, and comparisons between countries. The data used in this analysis comes from reputable sources such as the World Health Organization (WHO) and the OECD Health 
-Expenditure Database.
+The Global Health Spending Analysis project aims to investigate trends and patterns in health expenditures across different countries and regions. The analysis is conducted using a Jupyter notebook, "Global Health Spending Analysis.ipynb," which contains detailed steps and code implementations for each stage of the analysis.
 
-## Steps Taken
+### Steps Taken
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import plotly.express as px
+1. **Data Loading**:
+   - The dataset is loaded using pandas for data manipulation.
+
+    ```python
+    import pandas as pd
+
+    # Load the dataset
+    data = pd.read_csv('path_to_your_dataset.csv')
+    ```
+
+2. **Data Cleaning**:
+   - Data cleaning is performed to handle missing values, remove duplicates, and correct any inconsistencies.
+
+    ```python
+    # Handle missing values
+    data.fillna(method='ffill', inplace=True)
+
+    # Remove duplicates
+    data.drop_duplicates(inplace=True)
+
+    # Standardize column names
+    data.columns = [col.strip().lower().replace(' ', '_') for col in data.columns]
+    ```
+
+3. **Exploratory Data Analysis (EDA)**:
+   - Summary statistics and visualizations are created to understand the data distribution and identify patterns.
+
+    ```python
+    import matplotlib.pyplot as plt
+
+    # Summary statistics
+    print(data.describe())
+
+    # Distribution plot
+    plt.hist(data['health_expenditure'])
+    plt.title('Distribution of Health Expenditure')
+    plt.xlabel('Expenditure')
+    plt.ylabel('Frequency')
+    plt.show()
+    ```
+
+4. **Data Transformation**:
+   - Data is transformed to create new features and normalize existing ones for better analysis.
+
+    ```python
+    # Create per capita expenditure
+    data['per_capita_expenditure'] = data['total_expenditure'] / data['population']
+
+    # Normalize expenditure data
+    data['normalized_expenditure'] = (data['health_expenditure'] - data['health_expenditure'].mean()) / data['health_expenditure'].std()
+    ```
+
+5. **Visualization**:
+   - Various plots are generated to visualize the data and uncover trends and patterns.
+
+    ```python
+    # Bar chart of average health expenditure by region
+    avg_expenditure_by_region = data.groupby('region')['health_expenditure'].mean()
+    avg_expenditure_by_region.plot(kind='bar')
+    plt.title('Average Health Expenditure by Region')
+    plt.xlabel('Region')
+    plt.ylabel('Average Expenditure')
+    plt.show()
+    ```
+
+6. **Statistical Analysis**:
+   - Statistical models and tests are applied to draw inferences from the data.
+
+    ```python
+    import statsmodels.api as sm
+
+    # Linear regression model
+    X = data[['per_capita_income']]
+    y = data['health_expenditure']
+    X = sm.add_constant(X)  # Adds a constant term to the predictor
+    model = sm.OLS(y, X).fit()
+    print(model.summary())
+    ```
+
+7. **Results and Interpretation**:
+   - The results are presented and interpreted, highlighting key findings and their implications for global health spending.
 
 
-### 1. Data Loading
-- Loaded the CSV file containing global health expenditure data into a pandas DataFrame.
+### Conclusion
 
-csv_file_path = 'path/to/your/health_expenditure_data.csv'
-df = pd.read_csv(csv_file_path)
-
-### 2. Data Cleaning
-- Inspected the dataset for missing values and incorrect data types.
-- Cleaned the data by handling missing values and ensuring proper data types.
-
-# Check for missing values
-missing_values = df.isnull().sum()
-print("Missing Values:\n", missing_values)
-
-# Handle missing values (example: filling with mean or dropping)
-df_cleaned = df.fillna(df.mean())
-
-
-### 3. Data Description
-- Calculated basic statistics such as mean, median, and standard deviation for key columns.
-
-# Calculate basic statistics for the 'Value' column (health expenditure)
-basic_stats = df_cleaned['Value'].describe()
-print(basic_stats)
-
-
-### 4. Data Visualization
-- Visualized the distribution of health expenditure using histograms.
-
-# Histogram of health expenditure
-plt.hist(df_cleaned['Value'], bins=50)
-plt.title('Distribution of Health Expenditure')
-plt.xlabel('Health Expenditure')
-plt.ylabel('Frequency')
-plt.show()
-
-
-### 5. Trend Analysis
-- Analyzed health expenditure over time for selected countries to identify trends.
-
-# Filter data for selected countries and plot trends over time
-selected_countries = ['USA', 'Canada', 'Germany']
-df_selected = df_cleaned[df_cleaned['Country'].isin(selected_countries)]
-
-for country in selected_countries:
-    country_data = df_selected[df_selected['Country'] == country]
-    plt.plot(country_data['Year'], country_data['Value'], label=country)
-
-plt.title('Health Expenditure Over Time')
-plt.xlabel('Year')
-plt.ylabel('Health Expenditure')
-plt.legend()
-plt.show()
-
-
-### 6. Country Comparison
-- Identified the top 5 countries with the highest average health expenditure.
-
-# Calculate the average health expenditure for each country
-average_expenditure = df_cleaned.groupby('Country')['Value'].mean()
-top_5_countries = average_expenditure.nlargest(5)
-print("Top 5 Countries with Highest Average Health Expenditure:\n", top_5_countries)
-
-
-### 7. Interactive Dashboards
-- Created interactive dashboards using Plotly to visualize trends and comparisons.
-
-# Interactive time series plot using Plotly
-fig = px.line(df_selected, x='Year', y='Value', color='Country', title='Health Expenditure Over Time')
-fig.show()
+The Global Health Spending Analysis provides valuable insights into health expenditure patterns worldwide. By following the detailed steps in the notebook, users can reproduce the analysis and explore the data further to inform policy decisions and improve health outcomes.
 
